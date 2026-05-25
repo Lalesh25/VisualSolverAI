@@ -1,13 +1,11 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional, Type
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from razorpay import Client
-from razorpay.errors import BadRequestError, GatewayError, ServerError, SignatureVerificationError
 
 from database import User, get_user_by_id, set_user_pro, update_user_fields
 from services.auth import get_current_user
@@ -23,12 +21,41 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 PLAN_MONTHLY = "pro_monthly"
 PLAN_ANNUAL = "pro_annual"
 
+_razorpay_loaded: Optional[tuple[Any, tuple[Type[BaseException], ...]]] = None
+
+
+def _import_razorpay():
+    """Load razorpay on first use (avoids pkg_resources crash at app import on Render)."""
+    global _razorpay_loaded
+    if _razorpay_loaded is not None:
+        return _razorpay_loaded
+
+    try:
+        import pkg_resources  # noqa: F401
+    except ModuleNotFoundError:
+        import setuptools  # noqa: F401
+
+    from razorpay import Client
+    from razorpay.errors import (
+        BadRequestError,
+        GatewayError,
+        ServerError,
+        SignatureVerificationError,
+    )
+
+    _razorpay_loaded = (
+        Client,
+        (BadRequestError, GatewayError, ServerError, SignatureVerificationError),
+    )
+    return _razorpay_loaded
+
 
 def _strip(val: str | None) -> str:
     return (val or "").strip().strip("\ufeff")
 
 
-def _get_razorpay() -> tuple[Client, str]:
+def _get_razorpay():
+    Client, _ = _import_razorpay()
     key_id = _strip(os.getenv("RAZORPAY_KEY_ID"))
     key_secret = _strip(os.getenv("RAZORPAY_KEY_SECRET"))
     if not key_id or not key_secret:
@@ -65,6 +92,9 @@ async def razorpay_create_subscription(
 ):
     if body.plan not in (PLAN_MONTHLY, PLAN_ANNUAL):
         raise HTTPException(status_code=400, detail="Invalid plan.")
+
+    _, razorpay_errors = _import_razorpay()
+    BadRequestError, GatewayError, ServerError, _ = razorpay_errors
 
     client, key_id = _get_razorpay()
     plan_id = _plan_id_for_slug(body.plan)
@@ -111,6 +141,9 @@ async def razorpay_confirm_subscription(
     body: ConfirmSubscriptionBody,
     current_user: User = Depends(get_current_user),
 ):
+    _, razorpay_errors = _import_razorpay()
+    BadRequestError, GatewayError, ServerError, SignatureVerificationError = razorpay_errors
+
     client, _ = _get_razorpay()
     params = {
         "razorpay_subscription_id": body.razorpay_subscription_id.strip(),

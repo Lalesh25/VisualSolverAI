@@ -28,6 +28,6 @@ email-validator>=2.0.0
 # PDF Generation
 fpdf==1.7.2
 
-# Payments (razorpay imports pkg_resources from setuptools)
-setuptools>=69.0.0
+# Payments (razorpay 1.4.x needs pkg_resources; pin setuptools before it removed the shim)
+setuptools==69.5.1
 razorpay==1.4.2
