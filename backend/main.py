@@ -29,8 +29,6 @@ from services.payments import router as payments_router
 from services.model_output import clean_model_text, extract_visual_mermaid
 
 API_KEY = normalize_api_key(os.getenv("GEMINI_API_KEY"))
-if not API_KEY:
-    raise ValueError("GEMINI_API_KEY not set in backend/.env")
 
 # REST-only Gemini (no google-generativeai / grpc — works when cygrpc is blocked by App Control).
 # Default matches current AI Studio model list; override with GEMINI_VISION_MODEL=... in .env if needed.
@@ -57,7 +55,23 @@ app.include_router(payments_router)
 
 @app.get("/")
 def root():
-    return {"message": "✅ VisualSolver AI Backend (Gemini 2.5) Running!"}
+    mongo_ok = bool(normalize_env_value(os.getenv("MONGO_URI")))
+    return {
+        "message": "VisualSolver AI backend running",
+        "gemini_configured": bool(API_KEY),
+        "mongo_configured": mongo_ok,
+    }
+
+
+def _require_gemini_key():
+    if not API_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "GEMINI_API_KEY is not set. Add it in Render → Environment "
+                "(or backend/.env for local dev), then redeploy."
+            ),
+        )
 
 
 @app.post("/download_pdf")
@@ -113,6 +127,7 @@ async def process_image(
     visual_explanation -> if true (Pro), second model pass returns Mermaid diagram text.
     """
     try:
+        _require_gemini_key()
         if visual_explanation and (not current_user or not current_user.is_pro):
             raise HTTPException(
                 status_code=403,

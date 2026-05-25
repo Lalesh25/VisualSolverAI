@@ -11,8 +11,9 @@ python-multipart==0.0.9
 # Utility
 requests==2.32.3
 
-# MongoDB Driver
-pymongo[srv]
+# MongoDB Driver (dnspython required for mongodb+srv:// URIs)
+pymongo>=4.6.0
+dnspython>=2.6.0
 
 # Environment Variables
 python-dotenv==1.0.1
