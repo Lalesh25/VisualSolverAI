@@ -1,0 +1,86 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+
+# IDE
+.vscode/
+.vscode-test/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build outputs
+dist/
+build/
+.next/
+web-build/
+.expo/
+.expo-shared/
+
+# Dependency directories
+ios/
+android/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+.hypothesis/
+
+# Env files
+.env
+.env*.local
+.env.example
+.env.*.local
+
+# Debug assets
+backend/debug_preprocessed.png
+backend/indianpm.png
+
+# OS generated
+Thumbs.db
+ehthumbs.db
+
+# Editor directories and files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Testing
+coverage/
+.nyc_output
+/test-results/
+junit.xml
+
+# Production builds
+build/
+dist/
+*.tar.gz

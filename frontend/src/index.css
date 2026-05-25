@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    @apply antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply font-sans text-slate-800 bg-slate-100 min-h-screen;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer components {
+  .perspective-dramatic {
+    perspective: 1400px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  /* 3D lift on hover for primary panels */
+  .lift-3d {
+    @apply transition-all duration-300 ease-out;
+    transform: translateZ(0);
+  }
+  .lift-3d:hover {
+    transform: perspective(1000px) translateY(-4px) translateZ(12px) rotateX(2deg);
+  }
+
+  /* Primary CTA: pressed 3D */
+  .btn-3d {
+    @apply relative font-semibold rounded-xl transition-all duration-200;
+    transform: translateY(0);
+    box-shadow:
+      0 4px 0 0 rgba(15, 23, 42, 0.35),
+      0 12px 28px -6px rgba(20, 184, 166, 0.45);
+  }
+  .btn-3d:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow:
+      0 6px 0 0 rgba(15, 23, 42, 0.35),
+      0 18px 36px -8px rgba(34, 211, 238, 0.4);
+  }
+  .btn-3d:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow:
+      0 2px 0 0 rgba(15, 23, 42, 0.35),
+      0 6px 16px -4px rgba(20, 184, 166, 0.35);
+  }
+  .btn-3d:disabled {
+    @apply opacity-60 cursor-not-allowed;
+    box-shadow: 0 2px 0 0 rgba(15, 23, 42, 0.2);
+  }
+
+  .glass-panel {
+    @apply backdrop-blur-xl bg-white/70 border border-white/40 shadow-3d;
+  }
+  .glass-panel-dark {
+    @apply backdrop-blur-xl bg-slate-900/60 border border-cyan-500/15 shadow-glow;
+  }
+
+  .input-glow:focus {
+    @apply outline-none ring-2 ring-cyan-400/50 border-cyan-400/60 shadow-glow;
+  }
+}
