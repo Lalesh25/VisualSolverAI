@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import PhotoCropModal from "./PhotoCropModal";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+import { apiUrl } from '../config/api';
 
 function initialsFromUser(user) {
   const label = (user?.name || user?.email || "?").trim();
@@ -123,7 +123,7 @@ export default function ProfilePanel({ open, onClose, isDarkMode, panelClass }) 
     setBusy(true);
     setNotice(null);
     try {
-      const res = await fetch(`${API_BASE}/auth/me/photo`, {
+      const res = await fetch(apiUrl('/auth/me/photo'), {
         method: "PATCH",
         headers: authHeaders(),
         body: JSON.stringify({ photo_data_url: dataUrl }),
@@ -147,7 +147,7 @@ export default function ProfilePanel({ open, onClose, isDarkMode, panelClass }) 
     setBusy(true);
     setNotice(null);
     try {
-      const res = await fetch(`${API_BASE}/auth/me`, {
+      const res = await fetch(apiUrl('/auth/me'), {
         method: "PATCH",
         headers: authHeaders(),
         body: JSON.stringify({ name: name.trim() }),
@@ -187,7 +187,7 @@ export default function ProfilePanel({ open, onClose, isDarkMode, panelClass }) 
     setBusy(true);
     setNotice(null);
     try {
-      const res = await fetch(`${API_BASE}/auth/me/photo`, {
+      const res = await fetch(apiUrl('/auth/me/photo'), {
         method: "PATCH",
         headers: authHeaders(),
         body: JSON.stringify({ photo_data_url: null }),
@@ -214,7 +214,7 @@ export default function ProfilePanel({ open, onClose, isDarkMode, panelClass }) 
     setBusy(true);
     setNotice(null);
     try {
-      const res = await fetch(`${API_BASE}/auth/change-password`, {
+      const res = await fetch(apiUrl('/auth/change-password'), {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({

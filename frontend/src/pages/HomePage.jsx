@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { formatModelOutput } from '../utils/formatModelOutput';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+import { apiUrl } from '../config/api';
 
 function formatWhen(iso) {
   if (!iso) return '';
@@ -38,7 +38,7 @@ export default function HomePage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`${API_BASE}/history/submissions?limit=80`, {
+      const res = await fetch(apiUrl('/history/submissions?limit=80'), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.status === 401) {
@@ -69,7 +69,7 @@ export default function HomePage() {
     setDetailLoading(true);
     setDetail(null);
     try {
-      const res = await fetch(`${API_BASE}/history/submissions/${id}`, {
+      const res = await fetch(apiUrl(`/history/submissions/${id}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.status === 401) {

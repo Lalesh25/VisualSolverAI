@@ -6,7 +6,7 @@ import MermaidBlock from "./MermaidBlock";
 import SolutionVoicePlayer from "./SolutionVoicePlayer";
 import { formatModelOutput, wrapTextLines } from "../utils/formatModelOutput";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+import { apiUrl } from '../config/api';
 
 /** Matches UI font (Source Sans 3) for answer/error text drawn on canvas */
 const CANVAS_TEXT_FONT =
@@ -238,7 +238,7 @@ const CanvasPage = () => {
     setVisualExplanation("");
 
     try {
-      const res = await fetch(`${API_BASE}/process_image`, {
+      const res = await fetch(apiUrl('/process_image'), {
         method: "POST",
         body: formData,
         headers: authHeaders(),
@@ -326,7 +326,7 @@ const CanvasPage = () => {
     setVisualExplanation("");
 
     try {
-      const res = await fetch(`${API_BASE}/process_image`, {
+      const res = await fetch(apiUrl('/process_image'), {
         method: "POST",
         body: formData,
         headers: authHeaders(),
@@ -406,7 +406,7 @@ const CanvasPage = () => {
       formData.append("solution", fullSolution);
       formData.append("filename", "visualsolver-solution");
 
-      const res = await fetch(`${API_BASE}/download_pdf`, {
+      const res = await fetch(apiUrl('/download_pdf'), {
         method: "POST",
         body: formData,
         headers: authHeaders(),
@@ -472,7 +472,7 @@ const CanvasPage = () => {
     setSubscribeLoading(planId);
     try {
       await loadRazorpayScript();
-      const res = await fetch(`${API_BASE}/payments/razorpay/create-subscription`, {
+      const res = await fetch(apiUrl('/payments/razorpay/create-subscription'), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -513,7 +513,7 @@ const CanvasPage = () => {
             return;
           }
           try {
-            const confirmRes = await fetch(`${API_BASE}/payments/razorpay/confirm-subscription`, {
+            const confirmRes = await fetch(apiUrl('/payments/razorpay/confirm-subscription'), {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE, apiUrl, isApiSameAsFrontend, parseJsonResponse } from '../config/api';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
-
-function parseApiError(data) {
-  if (!data) return 'Something went wrong';
-  if (typeof data.detail === 'string') return data.detail;
-  if (Array.isArray(data.detail)) {
-    return data.detail
-      .map((x) => (typeof x === 'string' ? x : x.msg || JSON.stringify(x)))
-      .join(' ');
+function formatFetchError(err, apiBase) {
+  const msg = err?.message || '';
+  if (msg === 'Failed to fetch' || err?.name === 'TypeError') {
+    const hint =
+      apiBase.startsWith('http://127.0.0.1') || apiBase.startsWith('http://localhost')
+        ? 'VITE_API_URL was not set when the site was built — set it on Vercel to your Render https URL and redeploy.'
+        : 'Check that the Render backend is awake, uses https, and CORS_ORIGINS includes your Vercel URL (or redeploy backend after the latest CORS fix).';
+    return `Cannot reach API (${apiBase}). ${hint}`;
   }
-  return 'Something went wrong';
+  return msg || 'Something went wrong';
 }
 
 /**
@@ -45,6 +45,14 @@ export function AuthPageContent({
   }, [initialIsLogin]);
 
   useEffect(() => {
+    if (isApiSameAsFrontend()) {
+      setError(
+        'API URL misconfigured: VITE_API_URL must be your Render backend (https://….onrender.com), not this website. Fix in Vercel → Environment Variables, then redeploy.'
+      );
+    }
+  }, []);
+
+  useEffect(() => {
     if (!authLoading && isAuthenticated) {
       navigate(redirectTo, { replace: true });
       onClose?.();
@@ -60,23 +68,19 @@ export function AuthPageContent({
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
       const body = isLogin ? { email, password } : { email, password, name };
 
-      const response = await fetch(`${API_BASE}${endpoint}`, {
+      const response = await fetch(apiUrl(endpoint), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(parseApiError(data));
-      }
+      const data = await parseJsonResponse(response);
 
       await login(data.access_token, data);
       navigate(redirectTo, { replace: true });
       onClose?.();
     } catch (err) {
-      setError(err.message);
+      setError(formatFetchError(err, API_BASE));
     } finally {
       setLoading(false);
     }
@@ -86,20 +90,17 @@ export function AuthPageContent({
     setLoading(true);
     setError('');
     try {
-      const response = await fetch(`${API_BASE}/auth/google`, {
+      const response = await fetch(apiUrl('/auth/google'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential }),
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(parseApiError(data));
-      }
+      const data = await parseJsonResponse(response);
       await login(data.access_token, data);
       navigate(redirectTo, { replace: true });
       onClose?.();
     } catch (err) {
-      setError(err.message);
+      setError(formatFetchError(err, API_BASE));
     } finally {
       setLoading(false);
     }

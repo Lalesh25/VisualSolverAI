@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+import { apiUrl } from '../config/api';
 
 function mapMe(me) {
   return {
@@ -41,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     const t = localStorage.getItem('token');
     if (!t) return;
     try {
-      const res = await fetch(`${API_BASE}/auth/me`, {
+      const res = await fetch(apiUrl('/auth/me'), {
         headers: { Authorization: `Bearer ${t}` },
       });
       if (res.ok) {
@@ -70,7 +69,7 @@ export const AuthProvider = ({ children }) => {
           return;
         }
         setToken(stored);
-        const res = await fetch(`${API_BASE}/auth/me`, {
+        const res = await fetch(apiUrl('/auth/me'), {
           headers: { Authorization: `Bearer ${stored}` },
         });
         if (res.status === 401) {
@@ -105,7 +104,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', newToken);
     setToken(newToken);
     try {
-      const res = await fetch(`${API_BASE}/auth/me`, {
+      const res = await fetch(apiUrl('/auth/me'), {
         headers: { Authorization: `Bearer ${newToken}` },
       });
       if (res.ok) {
