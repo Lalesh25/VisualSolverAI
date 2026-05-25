@@ -1,32 +1,18 @@
-#backend run - uvicorn main:app --reload
+# Production deps (Render / cloud). Local OCR/vision extras: requirements-local.txt
+# Run: uvicorn main:app --reload
 
 # FastAPI & Server
 fastapi==0.115.2
 uvicorn==0.30.6
 python-multipart==0.0.9
 
-# Gemini is called via HTTPS REST in services/gemini_rest.py (avoids grpc blocked on some Windows policies).
-
-# Image & Math Processing (used in earlier OCR/preprocessing)
-opencv-python==4.10.0.84
-pillow==10.4.0
-numpy==1.24.4
-sympy==1.13.3
-
-# Optional OCR Support (if you ever use local OCR fallback)
-pytesseract==0.3.13
-easyocr==1.7.1
-# torch==2.4.1+cpu
-# torchvision==0.19.1+cpu
-# torchaudio==2.4.1+cpu
-# scikit-image==0.21.0
+# Gemini is called via HTTPS REST in services/gemini_rest.py
 
 # Utility
 requests==2.32.3
 
 # MongoDB Driver
 pymongo[srv]
-
 
 # Environment Variables
 python-dotenv==1.0.1

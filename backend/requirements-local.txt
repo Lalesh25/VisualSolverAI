@@ -1,0 +1,9 @@
+# Optional local-only stack (not used by main.py on deploy).
+# pip install -r requirements.txt -r requirements-local.txt
+
+opencv-python==4.10.0.84
+pillow==10.4.0
+numpy==1.26.4
+sympy==1.13.3
+pytesseract==0.3.13
+easyocr==1.7.1
